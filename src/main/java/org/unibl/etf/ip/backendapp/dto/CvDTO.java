@@ -2,9 +2,13 @@ package org.unibl.etf.ip.backendapp.dto;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Lob;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CvDTO {
     private Integer id;
     private String description;

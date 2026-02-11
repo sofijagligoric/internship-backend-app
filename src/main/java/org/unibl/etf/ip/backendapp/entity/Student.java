@@ -33,22 +33,7 @@ public class Student {
     @Column(name = "email", nullable = false)
     private String email;
 
-    /*
-    @OneToMany(mappedBy = "idStudent")
-    private Set<Application> applications = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "idStudent")
-    private Set<Cv> cvs = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "idStudent")
-    private Set<Evaluation> evaluations = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "idStudent")
-    private Set<Grade> grades = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "idStudent")
-    private Set<Workentry> workentries = new LinkedHashSet<>();
-
-     */
-
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "idFaculty", nullable = false)
+    private Faculty faculty;
 }

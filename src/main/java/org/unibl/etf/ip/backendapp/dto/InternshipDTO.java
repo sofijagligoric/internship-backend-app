@@ -1,9 +1,14 @@
 package org.unibl.etf.ip.backendapp.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class InternshipDTO {
     private Integer id;
     private String name;

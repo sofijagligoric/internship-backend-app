@@ -6,9 +6,7 @@ import org.unibl.etf.ip.backendapp.entity.Internship;
 import java.util.List;
 
 public interface InternshipRepository extends JpaRepository<Internship, Integer> {
-    List<Internship> findByStudentId(int studentId);
     List<Internship> findByCompanyId(int companyId);
-    List<Internship> findByStudentIdAndCompanyId(int studentId, int companyId);
 
     List<Internship> findByAvailable(Boolean available);
 }
