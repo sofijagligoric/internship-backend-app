@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.unibl.etf.ip.backendapp.dto.LoginRequest;
 import org.unibl.etf.ip.backendapp.dto.LoginResponse;
 import org.unibl.etf.ip.backendapp.entity.User;
+import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
 import org.unibl.etf.ip.backendapp.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -20,9 +21,9 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                .orElseThrow(() -> new ResourceNotFoundException("Invalid credentials"));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new ResourceNotFoundException("Invalid credentials");
         }
         return new LoginResponse(user.getId(), user.getRole());
     }

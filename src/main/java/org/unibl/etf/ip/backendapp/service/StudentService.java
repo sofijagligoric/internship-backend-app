@@ -5,8 +5,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.unibl.etf.ip.backendapp.dto.CreateUserDTO;
+import org.unibl.etf.ip.backendapp.dto.InternshipDTO;
 import org.unibl.etf.ip.backendapp.dto.StudentDTO;
 import org.unibl.etf.ip.backendapp.entity.*;
+import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
 import org.unibl.etf.ip.backendapp.repository.FacultyRepository;
 import org.unibl.etf.ip.backendapp.repository.StudentRepository;
 import org.unibl.etf.ip.backendapp.repository.UserRepository;
@@ -61,7 +63,7 @@ public class StudentService {
         newUser.setRole(Role.STUDENT);
         User savedUser = userRepository.save(newUser);
         Faculty faculty = facultyRepository.findById(studentDTO.getFacultyId())
-                .orElseThrow(() -> new RuntimeException("Faculty does not exist."));
+                .orElseThrow(() -> new ResourceNotFoundException("Faculty does not exist."));
         Student student = modelMapper.map(studentDTO, Student.class);
         student.setFaculty(faculty);
         student.setUser(savedUser);
@@ -71,7 +73,7 @@ public class StudentService {
 
     public StudentDTO updateStudent(Integer studentId, StudentDTO studentDTO) {
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
 
         if(studentDTO.getFirstName() != null) {
             student.setFirstName(studentDTO.getFirstName());
@@ -91,6 +93,7 @@ public class StudentService {
     }
 
     public StudentDTO getStudentById(Integer studentId) {
-        return modelMapper.map(studentRepository.findById(studentId).orElse(null), StudentDTO.class);
+        Student student = studentRepository.findById(studentId).orElseThrow(() -> new ResourceNotFoundException("Student with id " + studentId + " not found"));
+        return modelMapper.map(student, StudentDTO.class);
     }
 }

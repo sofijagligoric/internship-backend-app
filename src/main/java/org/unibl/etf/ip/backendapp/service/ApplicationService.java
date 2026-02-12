@@ -4,9 +4,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.unibl.etf.ip.backendapp.dto.ApplicationDTO;
+import org.unibl.etf.ip.backendapp.dto.CvDTO;
 import org.unibl.etf.ip.backendapp.entity.Application;
+import org.unibl.etf.ip.backendapp.entity.Cv;
 import org.unibl.etf.ip.backendapp.entity.Internship;
 import org.unibl.etf.ip.backendapp.entity.Student;
+import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
 import org.unibl.etf.ip.backendapp.repository.ApplicationRepository;
 import org.unibl.etf.ip.backendapp.repository.InternshipRepository;
 import org.unibl.etf.ip.backendapp.repository.StudentRepository;
@@ -35,9 +38,9 @@ public class ApplicationService {
 
     public ApplicationDTO create(Integer studentId, Integer internshipId) {
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student does not exist."));
+                .orElseThrow(() -> new ResourceNotFoundException("Student does not exist."));
         Internship internship = internshipRepository.findById(internshipId)
-                .orElseThrow(() -> new RuntimeException("Internship does not exist."));
+                .orElseThrow(() -> new ResourceNotFoundException("Internship does not exist."));
         if(applicationRepository.existsByStudentIdAndInternshipId(studentId, internshipId))
             throw new RuntimeException("Application already exists.");
 
@@ -60,9 +63,7 @@ public class ApplicationService {
     }
 
     public ApplicationDTO changeStatus(Integer applicationId, String status) {
-        if(!applicationRepository.existsById(applicationId))
-            throw new RuntimeException("Application does not exist.");
-        Application application = applicationRepository.findById(applicationId).orElseThrow(() -> new RuntimeException("Application does not exist."));
+        Application application = applicationRepository.findById(applicationId).orElseThrow(() -> new ResourceNotFoundException("Application does not exist."));
         application.setStatus(status);
         Application saved = applicationRepository.save(application);
         return modelMapper.map(saved, ApplicationDTO.class);
@@ -77,10 +78,16 @@ public class ApplicationService {
     }
 
     public ApplicationDTO getById(Integer applicationId) {
-        return applicationRepository.findById(applicationId).map(application -> modelMapper.map(application, ApplicationDTO.class)).orElse(null);
+        Application app = applicationRepository.findById(applicationId).orElseThrow(() -> new ResourceNotFoundException("Application with id " + applicationId + " not found"));
+        return modelMapper.map(app, ApplicationDTO.class);
     }
 
     public List<ApplicationDTO> getAllByCompanyId(Integer companyId) {
         return applicationRepository.findAllByInternshipCompanyId(companyId).stream().map(application -> modelMapper.map(application, ApplicationDTO.class)).collect(Collectors.toList());
+    }
+
+    public List<ApplicationDTO> getAllForStudentWithStatus(Integer studentId, String status)
+    {
+        return applicationRepository.findAllByStudentIdAndStatus(studentId, status).stream().map(application -> modelMapper.map(application, ApplicationDTO.class)).collect(Collectors.toList());
     }
 }

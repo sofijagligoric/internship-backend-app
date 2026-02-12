@@ -10,7 +10,7 @@ import org.unibl.etf.ip.backendapp.dto.LoginResponse;
 import org.unibl.etf.ip.backendapp.service.AuthService;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired

@@ -4,8 +4,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.unibl.etf.ip.backendapp.dto.InternshipDTO;
+import org.unibl.etf.ip.backendapp.dto.WorkentryDTO;
 import org.unibl.etf.ip.backendapp.entity.Company;
 import org.unibl.etf.ip.backendapp.entity.Internship;
+import org.unibl.etf.ip.backendapp.entity.Workentry;
+import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
 import org.unibl.etf.ip.backendapp.repository.CompanyRepository;
 import org.unibl.etf.ip.backendapp.repository.InternshipRepository;
 
@@ -38,13 +41,14 @@ public class InternshipService {
         return internshipRepository.findByAvailable(true).stream().map(internship -> modelMapper.map(internship, InternshipDTO.class)).collect(Collectors.toList());
    }
 
-   public InternshipDTO getById(int id) {
-        return modelMapper.map(internshipRepository.findById(id).orElse(null), InternshipDTO.class);
+   public InternshipDTO getById(int internshipId) {
+       Internship internship = internshipRepository.findById(internshipId).orElseThrow(() -> new ResourceNotFoundException("Internship with id " + internshipId + " not found"));
+       return modelMapper.map(internship, InternshipDTO.class);
    }
 
    public InternshipDTO create(InternshipDTO internshipDTO) {
        Company company = companyRepository.findById(internshipDTO.getCompanyId())
-               .orElseThrow(() -> new RuntimeException("Company does not exist."));
+               .orElseThrow(() -> new ResourceNotFoundException("Company does not exist."));
        Internship internship = modelMapper.map(internshipDTO, Internship.class);
        internship.setCompany(company);
        Internship internshipSaved = internshipRepository.save(internship);
@@ -61,7 +65,7 @@ public class InternshipService {
    }
 
    public InternshipDTO update(Integer id, InternshipDTO internshipDTO) {
-        Internship internship = internshipRepository.findById(id).orElseThrow(() -> new RuntimeException("Application does not exist."));
+        Internship internship = internshipRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Application does not exist."));
       if(internshipDTO.getAbout() != null) {
           internship.setAbout(internshipDTO.getAbout());
       }

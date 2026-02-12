@@ -4,7 +4,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.unibl.etf.ip.backendapp.dto.WorkentryDTO;
+import org.unibl.etf.ip.backendapp.dto.WorkentryDTO;
 import org.unibl.etf.ip.backendapp.entity.Workentry;
+import org.unibl.etf.ip.backendapp.entity.Workentry;
+import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
 import org.unibl.etf.ip.backendapp.repository.WorkentryRepository;
 
 import java.util.List;
@@ -50,7 +53,8 @@ public class WorkentryService {
         return workentryRepository.findByInternshipId(internshipId).stream().map(workentry -> modelMapper.map(workentry, WorkentryDTO.class)).collect(Collectors.toList());
     }
 
-    public WorkentryDTO getById(Integer id) {
-        return modelMapper.map(workentryRepository.findById(id).orElse(null), WorkentryDTO.class);
+    public WorkentryDTO getById(Integer workentryId) {
+        Workentry workentry = workentryRepository.findById(workentryId).orElseThrow(() -> new ResourceNotFoundException("Workentry with id " + workentryId + " not found"));
+        return modelMapper.map(workentry, WorkentryDTO.class);
     }
 }

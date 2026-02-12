@@ -4,10 +4,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.unibl.etf.ip.backendapp.dto.ApplicationDTO;
 import org.unibl.etf.ip.backendapp.dto.CreateUserDTO;
 import org.unibl.etf.ip.backendapp.dto.CompanyDTO;
+import org.unibl.etf.ip.backendapp.entity.Application;
 import org.unibl.etf.ip.backendapp.entity.Company;
 import org.unibl.etf.ip.backendapp.entity.User;
+import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
 import org.unibl.etf.ip.backendapp.repository.CompanyRepository;
 import org.unibl.etf.ip.backendapp.repository.UserRepository;
 import org.unibl.etf.ip.backendapp.util.Role;
@@ -35,15 +38,11 @@ public class CompanyService {
     }
 
     public boolean deleteCompany(Integer companyId) {
-
         Company company = companyRepository.findById(companyId)
                 .orElse(null);
-
         if (company == null) return false;
-
         userRepository.delete(company.getUser());
         companyRepository.delete(company);
-
         return true;
     }
 
@@ -61,7 +60,7 @@ public class CompanyService {
 
     public CompanyDTO updateCompany(Integer companyId, CompanyDTO companyDTO) {
         Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new RuntimeException("Company not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Company not found"));
 
         if(companyDTO.getName() != null) {
           company.setName(companyDTO.getName());
@@ -81,18 +80,19 @@ public class CompanyService {
     }
 
     public CompanyDTO getCompanyById(Integer companyId) {
-        return modelMapper.map(companyRepository.findById(companyId).orElse(null), CompanyDTO.class);
+        Company company = companyRepository.findById(companyId).orElseThrow(() -> new ResourceNotFoundException("Company with id " + companyId + " not found"));
+        return modelMapper.map(company, CompanyDTO.class);
     }
 
     public void changeStatus(Integer companyId) {
-        Company company = companyRepository.findById(companyId).orElseThrow(() -> new RuntimeException("Company not found"));
+        Company company = companyRepository.findById(companyId).orElseThrow(() -> new ResourceNotFoundException("Company not found"));
         company.setActive(!company.getActive());
         companyRepository.save(company);
     }
 
     public boolean changePassword(Integer companyId, String oldPassword, String newPassword) {
         User user = userRepository.findById(companyId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (user.getRole() != Role.COMPANY) {
             return false;

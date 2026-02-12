@@ -3,8 +3,13 @@ package org.unibl.etf.ip.backendapp.service;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.unibl.etf.ip.backendapp.dto.CompanyDTO;
 import org.unibl.etf.ip.backendapp.dto.EvaluationDTO;
+import org.unibl.etf.ip.backendapp.entity.Company;
 import org.unibl.etf.ip.backendapp.entity.Evaluation;
+import org.unibl.etf.ip.backendapp.entity.Internship;
+import org.unibl.etf.ip.backendapp.entity.Student;
+import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
 import org.unibl.etf.ip.backendapp.repository.CompanyRepository;
 import org.unibl.etf.ip.backendapp.repository.EvaluationRepository;
 import org.unibl.etf.ip.backendapp.repository.InternshipRepository;
@@ -31,16 +36,17 @@ public class EvaluationService {
     }
 
     public EvaluationDTO create(EvaluationDTO evaluationDTO) {
-        if(!companyRepository.existsById(evaluationDTO.getCompanyId())) {
-            throw new RuntimeException("Company does not exist");
-        }
-        if(!studentRepository.existsById(evaluationDTO.getStudentId())) {
-            throw new RuntimeException("Student does not exist");
-        }
-        if(!internshipRepository.existsById(evaluationDTO.getInternshipId())) {
-            throw new RuntimeException("Internship does not exist");
-        }
+        Student student = studentRepository.findById(evaluationDTO.getStudentId())
+                .orElseThrow(() -> new ResourceNotFoundException("Student does not exist."));
+        Company company = companyRepository.findById(evaluationDTO.getCompanyId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Company does not exist."));
+        Internship internship = internshipRepository.findById(evaluationDTO.getInternshipId())
+                .orElseThrow(() -> new ResourceNotFoundException("Internship does not exist."));
+
         Evaluation evaluation = modelMapper.map(evaluationDTO, Evaluation.class);
+        evaluation.setStudent(student);
+        evaluation.setCompany(company);
+        evaluation.setInternship(internship);
         Evaluation saved = evaluationRepository.save(evaluation);
         return modelMapper.map(saved, EvaluationDTO.class);
     }
@@ -71,6 +77,7 @@ public class EvaluationService {
     }
 
     public EvaluationDTO getById(int evaluationId) {
-        return modelMapper.map(evaluationRepository.findById(evaluationId).orElse(null), EvaluationDTO.class);
+        Evaluation evaluation = evaluationRepository.findById(evaluationId).orElseThrow(() -> new ResourceNotFoundException("Evaluation with id " + evaluationId + " not found"));
+        return modelMapper.map(evaluation, EvaluationDTO.class);
     }
 }

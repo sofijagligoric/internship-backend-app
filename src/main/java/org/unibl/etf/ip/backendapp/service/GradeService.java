@@ -3,8 +3,10 @@ package org.unibl.etf.ip.backendapp.service;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.unibl.etf.ip.backendapp.dto.EvaluationDTO;
 import org.unibl.etf.ip.backendapp.dto.GradeDTO;
-import org.unibl.etf.ip.backendapp.entity.Grade;
+import org.unibl.etf.ip.backendapp.entity.*;
+import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
 import org.unibl.etf.ip.backendapp.repository.FacultyRepository;
 import org.unibl.etf.ip.backendapp.repository.GradeRepository;
 import org.unibl.etf.ip.backendapp.repository.InternshipRepository;
@@ -32,16 +34,14 @@ public class GradeService {
     }
 
     public GradeDTO create(GradeDTO gradeDTO) {
-        if(!facultyRepository.existsById(gradeDTO.getFacultyId())) {
-            throw new RuntimeException("Faculty does not exist");
-        }
-        if(!studentRepository.existsById(gradeDTO.getStudentId())) {
-            throw new RuntimeException("Student does not exist");
-        }
-        if(!internshipRepository.existsById(gradeDTO.getInternshipId())) {
-            throw new RuntimeException("Internship does not exist");
-        }
+        Faculty faculty = facultyRepository.findById(gradeDTO.getFacultyId()).orElseThrow(() -> new ResourceNotFoundException("Faculty does not exist."));
+        Internship internship = internshipRepository.findById(gradeDTO.getInternshipId()).orElseThrow(() -> new ResourceNotFoundException("Internship does not exist."));
+        Student student = studentRepository.findById(gradeDTO.getStudentId()).orElseThrow(() -> new ResourceNotFoundException("Student does not exist."));
+
         Grade grade = modelMapper.map(gradeDTO, Grade.class);
+        grade.setFaculty(faculty);
+        grade.setStudent(student);
+        grade.setInternship(internship);
         Grade saved = gradeRepository.save(grade);
         return modelMapper.map(saved, GradeDTO.class);
     }
@@ -72,6 +72,7 @@ public class GradeService {
     }
 
     public GradeDTO getById(int gradeId) {
-        return modelMapper.map(gradeRepository.findById(gradeId).orElse(null), GradeDTO.class);
+        Grade grade = gradeRepository.findById(gradeId).orElseThrow(() -> new ResourceNotFoundException("Grade with id " + gradeId + " not found"));
+        return modelMapper.map(grade, GradeDTO.class);
     }
 }
