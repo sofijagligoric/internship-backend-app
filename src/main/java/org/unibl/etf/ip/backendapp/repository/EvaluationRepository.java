@@ -11,6 +11,5 @@ public interface EvaluationRepository extends JpaRepository<Evaluation, Integer>
     List<Evaluation> findByInternshipId(int internshipId);
     List<Evaluation> findByCompanyId(int companyId);
     List<Evaluation> findByStudentIdAndCompanyId(int studentId, int companyId);
-    List<Evaluation> findByCompanyIdAndStudentIdAndInternshipId(int companyId, int studentId, int internshipId);
     boolean existsByStudentIdAndInternshipId(int studentId, int internshipId);
 }

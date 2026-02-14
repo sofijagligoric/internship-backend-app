@@ -50,6 +50,9 @@ public class CvService {
     }
 
     public CvDTO create(CvDTO cvDTO, MultipartFile image) {
+        if(cvRepository.existsByStudentId(cvDTO.getStudentId())) {
+            throw new RuntimeException("This student already has CV.");
+        }
         Student student = studentRepository.findById(cvDTO.getStudentId()).orElseThrow(() -> new ResourceNotFoundException("Student does not exist."));
         Cv cv = modelMapper.map(cvDTO, Cv.class);
         cv.setStudent(student);

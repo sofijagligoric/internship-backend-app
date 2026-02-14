@@ -3,6 +3,7 @@ package org.unibl.etf.ip.backendapp.service;
 import org.springframework.stereotype.Service;
 import org.unibl.etf.ip.backendapp.dto.LoginRequest;
 import org.unibl.etf.ip.backendapp.dto.LoginResponse;
+import org.unibl.etf.ip.backendapp.dto.PasswordChangeDTO;
 import org.unibl.etf.ip.backendapp.entity.User;
 import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
 import org.unibl.etf.ip.backendapp.repository.UserRepository;

@@ -57,4 +57,8 @@ public class WorkentryService {
         Workentry workentry = workentryRepository.findById(workentryId).orElseThrow(() -> new ResourceNotFoundException("Workentry with id " + workentryId + " not found"));
         return modelMapper.map(workentry, WorkentryDTO.class);
     }
+
+    public List<WorkentryDTO> getAll(){
+        return workentryRepository.findAll().stream().map(workentry -> modelMapper.map(workentry, WorkentryDTO.class)).collect(Collectors.toList());
+    }
 }

@@ -4,10 +4,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.unibl.etf.ip.backendapp.dto.ApplicationDTO;
-import org.unibl.etf.ip.backendapp.dto.CreateUserDTO;
 import org.unibl.etf.ip.backendapp.dto.CompanyDTO;
-import org.unibl.etf.ip.backendapp.entity.Application;
+import org.unibl.etf.ip.backendapp.dto.CreateCompanyDTO;
 import org.unibl.etf.ip.backendapp.entity.Company;
 import org.unibl.etf.ip.backendapp.entity.User;
 import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
@@ -33,7 +31,7 @@ public class CompanyService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<CompanyDTO> getAllCompanys() {
+    public List<CompanyDTO> getAllCompanies() {
         return companyRepository.findAll().stream().map(company -> modelMapper.map(company, CompanyDTO.class)).collect(Collectors.toList());
     }
 
@@ -41,18 +39,22 @@ public class CompanyService {
         Company company = companyRepository.findById(companyId)
                 .orElse(null);
         if (company == null) return false;
-        userRepository.delete(company.getUser());
         companyRepository.delete(company);
+        userRepository.delete(company.getUser());
         return true;
     }
 
-    public CompanyDTO createCompany(CreateUserDTO user, CompanyDTO companyDTO) {
+    public CompanyDTO createCompany(CreateCompanyDTO newCompanyDTO) {
         User newUser = new User();
-        newUser.setUsername(user.getUsername());
-        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        newUser.setUsername(newCompanyDTO.getUsername());
+        newUser.setPassword(passwordEncoder.encode(newCompanyDTO.getPassword()));
         newUser.setRole(Role.COMPANY);
         User savedUser = userRepository.save(newUser);
-        Company company = modelMapper.map(companyDTO, Company.class);
+        Company company = new Company();
+        company.setActive(newCompanyDTO.getActive());
+        company.setAddress(newCompanyDTO.getAddress());
+        company.setEmail(newCompanyDTO.getEmail());
+        company.setName(newCompanyDTO.getName());
         company.setUser(savedUser);
         Company companySaved = companyRepository.save(company);
         return modelMapper.map(companySaved, CompanyDTO.class);
@@ -90,19 +92,4 @@ public class CompanyService {
         companyRepository.save(company);
     }
 
-    public boolean changePassword(Integer companyId, String oldPassword, String newPassword) {
-        User user = userRepository.findById(companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
-        if (user.getRole() != Role.COMPANY) {
-            return false;
-        }
-        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            return false;
-        }
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
-
-        return true;
-    }
 }

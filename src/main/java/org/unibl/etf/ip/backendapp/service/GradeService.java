@@ -3,7 +3,6 @@ package org.unibl.etf.ip.backendapp.service;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.unibl.etf.ip.backendapp.dto.EvaluationDTO;
 import org.unibl.etf.ip.backendapp.dto.GradeDTO;
 import org.unibl.etf.ip.backendapp.entity.*;
 import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
@@ -34,6 +33,9 @@ public class GradeService {
     }
 
     public GradeDTO create(GradeDTO gradeDTO) {
+        if(gradeRepository.existsByStudentAndInternshipId(gradeDTO.getStudentId(), gradeDTO.getInternshipId())) {
+            throw new RuntimeException("Grade for this student and this internship already exists.");
+        }
         Faculty faculty = facultyRepository.findById(gradeDTO.getFacultyId()).orElseThrow(() -> new ResourceNotFoundException("Faculty does not exist."));
         Internship internship = internshipRepository.findById(gradeDTO.getInternshipId()).orElseThrow(() -> new ResourceNotFoundException("Internship does not exist."));
         Student student = studentRepository.findById(gradeDTO.getStudentId()).orElseThrow(() -> new ResourceNotFoundException("Student does not exist."));
@@ -74,5 +76,20 @@ public class GradeService {
     public GradeDTO getById(int gradeId) {
         Grade grade = gradeRepository.findById(gradeId).orElseThrow(() -> new ResourceNotFoundException("Grade with id " + gradeId + " not found"));
         return modelMapper.map(grade, GradeDTO.class);
+    }
+
+    public List<GradeDTO> getAll(){
+        return gradeRepository.findAll().stream().map(grade -> modelMapper.map(grade, GradeDTO.class)).collect(Collectors.toList());
+    }
+
+    public GradeDTO update(Integer id, GradeDTO gradeDTO) {
+        Grade grade = gradeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Grade does not exist."));
+        if(gradeDTO.getValue() != null)
+            grade.setValue(gradeDTO.getValue());
+        if(gradeDTO.getInternshipId() != null)
+            grade.setInternship(internshipRepository.findById(gradeDTO.getInternshipId()).orElseThrow(() -> new ResourceNotFoundException("Internship does not exist.")));
+        Grade saved = gradeRepository.save(grade);
+        return modelMapper.map(saved, GradeDTO.class);
+
     }
 }

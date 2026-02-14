@@ -4,8 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.unibl.etf.ip.backendapp.dto.CreateUserDTO;
-import org.unibl.etf.ip.backendapp.dto.InternshipDTO;
+import org.unibl.etf.ip.backendapp.dto.CreateStudentDTO;
 import org.unibl.etf.ip.backendapp.dto.StudentDTO;
 import org.unibl.etf.ip.backendapp.entity.*;
 import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
@@ -47,24 +46,25 @@ public class StudentService {
 
         Student student = studentRepository.findById(studentId)
                 .orElse(null);
-
         if (student == null) return false;
-
-        userRepository.delete(student.getUser());
         studentRepository.delete(student);
-
+        userRepository.delete(student.getUser());
         return true;
     }
 
-    public StudentDTO createStudent(CreateUserDTO user, StudentDTO studentDTO) {
+    public StudentDTO createStudent(CreateStudentDTO newStudentDTO) {
         User newUser = new User();
-        newUser.setUsername(user.getUsername());
-        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        newUser.setUsername(newStudentDTO.getUsername());
+        newUser.setPassword(passwordEncoder.encode(newStudentDTO.getPassword()));
         newUser.setRole(Role.STUDENT);
         User savedUser = userRepository.save(newUser);
-        Faculty faculty = facultyRepository.findById(studentDTO.getFacultyId())
+        Faculty faculty = facultyRepository.findById(newStudentDTO.getFacultyId())
                 .orElseThrow(() -> new ResourceNotFoundException("Faculty does not exist."));
-        Student student = modelMapper.map(studentDTO, Student.class);
+        Student student = new Student();
+        student.setIndeks(newStudentDTO.getIndeks());
+        student.setFirstName(newStudentDTO.getFirstName());
+        student.setLastName(newStudentDTO.getLastName());
+        student.setEmail(newStudentDTO.getEmail());
         student.setFaculty(faculty);
         student.setUser(savedUser);
         Student studentSaved = studentRepository.save(student);
