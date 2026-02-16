@@ -74,14 +74,20 @@
         <dependency>
             <groupId>org.modelmapper</groupId>
             <artifactId>modelmapper</artifactId>
-            <version> 3.2.0</version>
+            <version>3.2.0</version>
         </dependency>
 
-            <dependency>
-                <groupId>com.google.genai</groupId>
-                <artifactId>google-genai</artifactId>
-                <version>1.0.0</version>
-            </dependency>
+        <dependency>
+            <groupId>com.google.genai</groupId>
+            <artifactId>google-genai</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.rometools</groupId>
+            <artifactId>rome</artifactId>
+            <version>2.1.0</version>
+        </dependency>
     </dependencies>
 
     <build>
