@@ -2,6 +2,7 @@ package org.unibl.etf.ip.backendapp.service;
 
 import org.springframework.stereotype.Service;
 import org.unibl.etf.ip.backendapp.dto.RecommendationDTO;
+import org.unibl.etf.ip.backendapp.dto.RecommendationViewDTO;
 import org.unibl.etf.ip.backendapp.entity.Cv;
 import org.unibl.etf.ip.backendapp.entity.Internship;
 import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
@@ -26,7 +27,7 @@ public class RecommendationService {
         this.geminiService = geminiService;
     }
 
-    public List<RecommendationDTO> recommendForStudent(Integer studentId) {
+    public List<RecommendationViewDTO> recommendForStudent(Integer studentId) {
         Cv cv = cvRepository.findByStudentId(studentId).orElseThrow(() -> new ResourceNotFoundException("CV not found"));
         List<Internship> internships = internshipRepository.findByAvailableTrue();
         if (internships.isEmpty()) {
@@ -36,8 +37,26 @@ public class RecommendationService {
         String internshipsText = createInternshipsPromptText(internships);
         String prompt = createFullPrompt(cvText, internshipsText);
         String aiResponse = geminiService.generateAnswer(prompt);
-        List<RecommendationDTO> recommendations = parseAIResponse(aiResponse);
-        return recommendations.stream().sorted((a, b) -> Double.compare(b.getScore(), a.getScore()))
+        List<RecommendationDTO> aiRecommendations = parseAIResponse(aiResponse);
+        return aiRecommendations.stream()
+                .map(aiRec -> {
+                    Internship internship = internshipRepository.findById(aiRec.getInternshipId()).orElse(null);
+                    if (internship == null) {
+                        return null;
+                    }
+                    return new RecommendationViewDTO(
+                            internship.getId(),
+                            internship.getName(),
+                            internship.getAbout(),
+                            internship.getTechnologies(),
+                            internship.getSkills(),
+                            internship.getRequirements(),
+                            aiRec.getScore(),
+                            aiRec.getReason()
+                    );
+                })
+                .filter(r -> r != null)
+                .sorted((a, b) -> Double.compare(b.getScore(), a.getScore()))
                 .limit(5)
                 .toList();
     }
@@ -94,33 +113,34 @@ public class RecommendationService {
     private String createFullPrompt(String cvText, String internshipsText) {
 
         return """
-            You are an AI system that evaluates internship compatibility.
-
-            Based on the student CV and the list of internships,
-            return ONLY a valid JSON array in this exact format:
-
-            [
-              {
-                "internshipId": number,
-                "score": number between 0 and 1,
-                "reason": "short explanation"
-              }
-            ]
-
-            Return results for ALL internships.
-            Do not return anything except valid JSON.
-            
-            %s
-            
-            Internships:
-            %s
-            """.formatted(cvText, internshipsText);
+                You are an AI system that evaluates internship compatibility.
+                
+                Based on the student CV and the list of internships,
+                return ONLY a valid JSON array in this exact format:
+                
+                [
+                  {
+                    "internshipId": number,
+                    "score": number between 0 and 1,
+                    "reason": "short explanation"
+                  }
+                ]
+                
+                Return results for ALL internships.
+                Do not return anything except valid JSON.
+                
+                %s
+                
+                Internships:
+                %s
+                """.formatted(cvText, internshipsText);
     }
 
     private List<RecommendationDTO> parseAIResponse(String response) {
         try {
             response = response.replace("```json", "").replace("```", "").trim();
-            return objectMapper.readValue(response, new TypeReference<List<RecommendationDTO>>() {});
+            return objectMapper.readValue(response, new TypeReference<List<RecommendationDTO>>() {
+            });
         } catch (Exception e) {
             return List.of();
         }

@@ -40,9 +40,12 @@ public class CvService {
     }
 
     public CvDTO getByStudent(Integer studentId) {
-        if(!studentRepository.existsById(studentId))
+        if (!studentRepository.existsById(studentId)) {
             throw new ResourceNotFoundException("Student not found");
-        return modelMapper.map(cvRepository.findByStudentId(studentId), CvDTO.class);
+        }
+        Cv cv = cvRepository.findByStudentId(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException("CV not found"));
+        return modelMapper.map(cv, CvDTO.class);
     }
 
     public List<CvDTO> getAll() {

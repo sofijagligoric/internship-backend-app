@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.unibl.etf.ip.backendapp.dto.CvDTO;
 import org.unibl.etf.ip.backendapp.service.CvService;
-import tools.jackson.databind.ObjectMapper;
+//import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -21,8 +22,7 @@ public class CvController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CvDTO> create(
             @RequestPart("cv") String cvJson,
-            @RequestPart(value = "image", required = false) MultipartFile image) {
-
+            @RequestPart(value = "image", required = false) MultipartFile image) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         CvDTO cvDTO = mapper.readValue(cvJson, CvDTO.class);
         CvDTO created = cvService.create(cvDTO, image);
@@ -33,8 +33,7 @@ public class CvController {
     public ResponseEntity<CvDTO> update(
             @PathVariable Integer id,
             @RequestPart("cv") String cvJson,
-            @RequestPart(value = "image", required = false) MultipartFile image) {
-
+            @RequestPart(value = "image", required = false) MultipartFile image) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         CvDTO cvDTO = mapper.readValue(cvJson, CvDTO.class);
         CvDTO updated = cvService.update(id, cvDTO, image);
