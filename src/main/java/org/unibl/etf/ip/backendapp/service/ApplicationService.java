@@ -51,15 +51,6 @@ public class ApplicationService {
         application.setDate(LocalDate.now());
         Application saved = applicationRepository.save(application);
         return modelMapper.map(saved, ApplicationDTO.class);
-        /*
-        ApplicationDTO responseDTO = new ApplicationDTO();
-        responseDTO.setId(saved.getId());
-        responseDTO.setStudentId(saved.getStudent().getId());
-        responseDTO.setInternshipId(saved.getInternship().getId());
-        responseDTO.setStatus(saved.getStatus());
-        responseDTO.setDate(saved.getDate());
-        return responseDTO;
-         */
     }
 
     public ApplicationDTO changeStatus(Integer applicationId, String status) {

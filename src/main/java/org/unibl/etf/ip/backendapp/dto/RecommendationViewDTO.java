@@ -15,6 +15,7 @@ public class RecommendationViewDTO {
     private String technologies;
     private String skills;
     private String requirements;
+    private String company;
 
     private Double score;
     private String reason;

@@ -4,12 +4,15 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.unibl.etf.ip.backendapp.dto.WorkentryDTO;
-import org.unibl.etf.ip.backendapp.dto.WorkentryDTO;
-import org.unibl.etf.ip.backendapp.entity.Workentry;
+import org.unibl.etf.ip.backendapp.entity.Internship;
 import org.unibl.etf.ip.backendapp.entity.Workentry;
 import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
+import org.unibl.etf.ip.backendapp.repository.InternshipRepository;
 import org.unibl.etf.ip.backendapp.repository.WorkentryRepository;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,19 +21,39 @@ import java.util.stream.Collectors;
 public class WorkentryService {
 
     private WorkentryRepository workentryRepository;
+    private InternshipRepository internshipRepository;
     private ModelMapper modelMapper;
 
-    public WorkentryService(WorkentryRepository workentryRepository, ModelMapper modelMapper) {
+    public WorkentryService(WorkentryRepository workentryRepository, ModelMapper modelMapper, InternshipRepository internshipRepository) {
         this.workentryRepository = workentryRepository;
         this.modelMapper = modelMapper;
+        this.internshipRepository = internshipRepository;
     }
 
     public WorkentryDTO create(WorkentryDTO workentryDTO) {
-        if(workentryRepository.existsByWeekStart(workentryDTO.getWeekStart())) {
-            throw new RuntimeException("Week start already exists");
+        LocalDate weekStart = workentryDTO.getWeekStart()
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+
+        workentryDTO.setWeekStart(weekStart);
+        if(workentryRepository.existsByStudentIdAndInternshipIdAndWeekStart(
+                workentryDTO.getStudentId(),
+                workentryDTO.getInternshipId(),
+                weekStart
+        )) {
+            throw new RuntimeException("Work entry already exists for this week");
         }
+
+        Internship internship = internshipRepository.findById(workentryDTO.getInternshipId())
+                .orElseThrow(() -> new ResourceNotFoundException("Internship not found"));
+//
+//        if(weekStart.isBefore(internship.getStartDate()) ||
+//                weekStart.isAfter(internship.getEndDate())) {
+//            throw new RuntimeException("Week is outside internship duration");
+//        }
+
         Workentry workentry = modelMapper.map(workentryDTO, Workentry.class);
         workentry = workentryRepository.save(workentry);
+
         return modelMapper.map(workentry, WorkentryDTO.class);
     }
 

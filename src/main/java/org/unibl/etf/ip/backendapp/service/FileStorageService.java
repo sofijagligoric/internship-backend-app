@@ -30,4 +30,14 @@ public class FileStorageService {
             throw new RuntimeException("Could not store file.", e);
         }
     }
+
+    public void deleteFile(String path, String fileName) {
+        try {
+            if (fileName == null) return;
+            Path filePath = Paths.get(path, fileName);
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not delete file.", e);
+        }
+    }
 }

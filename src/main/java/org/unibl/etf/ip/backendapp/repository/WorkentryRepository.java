@@ -11,5 +11,6 @@ public interface WorkentryRepository extends JpaRepository<Workentry, Integer> {
     List<Workentry> findByInternshipId(int internshipId);
     List<Workentry> findByStudentIdAndInternshipId(int studentId, int internshipId);
 
-    boolean existsByWeekStart(LocalDate weekStart);
+    boolean existsByStudentIdAndInternshipIdAndWeekStart(Integer studentId, Integer internshipId, LocalDate weekStart);
+
 }

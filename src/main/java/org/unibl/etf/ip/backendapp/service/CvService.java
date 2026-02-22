@@ -53,7 +53,7 @@ public class CvService {
     }
 
     public CvDTO create(CvDTO cvDTO, MultipartFile image) {
-        if(cvRepository.existsByStudentId(cvDTO.getStudentId())) {
+        if (cvRepository.existsByStudentId(cvDTO.getStudentId())) {
             throw new RuntimeException("This student already has CV.");
         }
         Student student = studentRepository.findById(cvDTO.getStudentId()).orElseThrow(() -> new ResourceNotFoundException("Student does not exist."));
@@ -68,40 +68,54 @@ public class CvService {
     }
 
     public boolean delete(Integer cvId) {
-        if(cvRepository.existsById(cvId)) {
+        Cv original = cvRepository.findById(cvId)
+                .orElseThrow(() -> new ResourceNotFoundException("CV not found"));
+            if (original.getImagePath() != null) {
+                fileStorageService.deleteFile(imagesDir, original.getImagePath());
             cvRepository.deleteById(cvId);
             return true;
         }
         return false;
     }
 
-    public CvDTO update(Integer cvId, CvDTO cvDTO, MultipartFile image){
-        Cv original = cvRepository.findById(cvId).orElseThrow(() -> new ResourceNotFoundException("CV not found"));
-        if(cvDTO.getStudentId() != null && !original.getStudent().getId().equals(cvDTO.getStudentId()))
+    public CvDTO update(Integer cvId, CvDTO cvDTO, MultipartFile image) {
+
+        Cv original = cvRepository.findById(cvId)
+                .orElseThrow(() -> new ResourceNotFoundException("CV not found"));
+        if (cvDTO.getStudentId() != null &&
+                !original.getStudent().getId().equals(cvDTO.getStudentId())) {
             throw new RuntimeException("Student id mismatch");
-        if(cvDTO.getContact() != null)
+        }
+        if (cvDTO.getContact() != null)
             original.setContact(cvDTO.getContact());
-        if(cvDTO.getExperience() != null)
+        if (cvDTO.getExperience() != null)
             original.setExperience(cvDTO.getExperience());
-        if(cvDTO.getDescription() != null)
+        if (cvDTO.getDescription() != null)
             original.setDescription(cvDTO.getDescription());
-        if(cvDTO.getInterests() != null)
+        if (cvDTO.getInterests() != null)
             original.setInterests(cvDTO.getInterests());
-        if(cvDTO.getFirstName() != null)
+        if (cvDTO.getFirstName() != null)
             original.setFirstName(cvDTO.getFirstName());
-        if(cvDTO.getLastName()!= null)
+        if (cvDTO.getLastName() != null)
             original.setLastName(cvDTO.getLastName());
-        if(cvDTO.getSchool() != null)
+        if (cvDTO.getSchool() != null)
             original.setSchool(cvDTO.getSchool());
-        if(cvDTO.getInternships() != null)
+        if (cvDTO.getInternships() != null)
             original.setInternships(cvDTO.getInternships());
-        if(cvDTO.getSkills() != null)
+        if (cvDTO.getSkills() != null)
             original.setSkills(cvDTO.getSkills());
-        if(cvDTO.getTraining() != null)
+        if (cvDTO.getTraining() != null)
             original.setTraining(cvDTO.getTraining());
-        if(cvDTO.getImagePath() != null)
-            original.setImagePath(cvDTO.getImagePath());
+        if (cvDTO.getImagePath() != null && cvDTO.getImagePath().isEmpty()) {
+            if (original.getImagePath() != null) {
+                fileStorageService.deleteFile(imagesDir, original.getImagePath());
+                original.setImagePath(null);
+            }
+        }
         if (image != null && !image.isEmpty()) {
+            if (original.getImagePath() != null) {
+                fileStorageService.deleteFile(imagesDir, original.getImagePath());
+            }
             String fileName = fileStorageService.saveFile(image, imagesDir);
             original.setImagePath(fileName);
         }

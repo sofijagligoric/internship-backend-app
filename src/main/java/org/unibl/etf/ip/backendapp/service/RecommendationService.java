@@ -12,6 +12,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class RecommendationService {
@@ -33,6 +35,8 @@ public class RecommendationService {
         if (internships.isEmpty()) {
             return List.of();
         }
+        Map<Integer, Internship> internshipMap = internships.stream()
+                .collect(Collectors.toMap(Internship::getId, i -> i));
         String cvText = createCVPromptText(cv);
         String internshipsText = createInternshipsPromptText(internships);
         String prompt = createFullPrompt(cvText, internshipsText);
@@ -40,10 +44,8 @@ public class RecommendationService {
         List<RecommendationDTO> aiRecommendations = parseAIResponse(aiResponse);
         return aiRecommendations.stream()
                 .map(aiRec -> {
-                    Internship internship = internshipRepository.findById(aiRec.getInternshipId()).orElse(null);
-                    if (internship == null) {
-                        return null;
-                    }
+                    Internship internship = internshipMap.get(aiRec.getInternshipId());
+                    if (internship == null) return null;
                     return new RecommendationViewDTO(
                             internship.getId(),
                             internship.getName(),
@@ -51,6 +53,7 @@ public class RecommendationService {
                             internship.getTechnologies(),
                             internship.getSkills(),
                             internship.getRequirements(),
+                            internship.getCompany().getName(),
                             aiRec.getScore(),
                             aiRec.getReason()
                     );
