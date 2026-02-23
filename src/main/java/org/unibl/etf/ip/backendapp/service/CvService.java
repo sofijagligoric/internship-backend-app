@@ -70,14 +70,12 @@ public class CvService {
     public boolean delete(Integer cvId) {
         Cv original = cvRepository.findById(cvId)
                 .orElseThrow(() -> new ResourceNotFoundException("CV not found"));
-            if (original.getImagePath() != null) {
-                fileStorageService.deleteFile(imagesDir, original.getImagePath());
-            cvRepository.deleteById(cvId);
-            return true;
+        if (original.getImagePath() != null) {
+            fileStorageService.deleteFile(imagesDir, original.getImagePath());
         }
-        return false;
+        cvRepository.deleteById(cvId);
+        return true;
     }
-
     public CvDTO update(Integer cvId, CvDTO cvDTO, MultipartFile image) {
 
         Cv original = cvRepository.findById(cvId)
