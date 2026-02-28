@@ -1,8 +1,10 @@
 package org.unibl.etf.ip.backendapp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.unibl.etf.ip.backendapp.dto.ApplicationViewDTO;
 import org.unibl.etf.ip.backendapp.dto.InternshipDTO;
 import org.unibl.etf.ip.backendapp.service.InternshipService;
 
@@ -33,12 +35,26 @@ public class InternshipController {
         return ResponseEntity.ok(internships);
     }
 
+    /*
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         if (internshipService.delete(id)) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        try {
+            if (internshipService.delete(id)) {
+                return ResponseEntity.ok().build();
+            }
+            return ResponseEntity.notFound().build();
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 
     @PostMapping
@@ -56,6 +72,12 @@ public class InternshipController {
     @PutMapping("/{id}")
     public ResponseEntity<InternshipDTO> update(@PathVariable Integer id, @RequestBody InternshipDTO internshipDTO) {
         InternshipDTO updated = internshipService.update(id, internshipDTO);
+        return ResponseEntity.ok(updated);
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<InternshipDTO> changeStatus(@PathVariable Integer id) {
+        InternshipDTO updated = internshipService.updateAvailability(id);
         return ResponseEntity.ok(updated);
     }
 

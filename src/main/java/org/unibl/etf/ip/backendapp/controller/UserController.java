@@ -13,7 +13,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PatchMapping("/{id}/password")
+    @PutMapping("/{id}/password")
     public ResponseEntity<Void> changePassword(
             @PathVariable Integer id,
             @RequestBody PasswordChangeDTO request) {

@@ -64,8 +64,17 @@ public class InternshipService {
        return false;
    }
 
+    public InternshipDTO updateAvailability(Integer id) {
+        Internship internship = internshipRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Internship not found"));
+
+        internship.setAvailable(!internship.getAvailable());
+        Internship saved = internshipRepository.save(internship);
+        return modelMapper.map(saved, InternshipDTO.class);
+    }
+
    public InternshipDTO update(Integer id, InternshipDTO internshipDTO) {
-        Internship internship = internshipRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Application does not exist."));
+        Internship internship = internshipRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Internship does not exist."));
       if(internshipDTO.getAbout() != null) {
           internship.setAbout(internshipDTO.getAbout());
       }

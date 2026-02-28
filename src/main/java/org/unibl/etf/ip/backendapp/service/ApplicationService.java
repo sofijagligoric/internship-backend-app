@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.unibl.etf.ip.backendapp.dto.ApplicationDTO;
+import org.unibl.etf.ip.backendapp.dto.ApplicationViewDTO;
 import org.unibl.etf.ip.backendapp.dto.CvDTO;
 import org.unibl.etf.ip.backendapp.entity.Application;
 import org.unibl.etf.ip.backendapp.entity.Cv;
@@ -53,11 +54,20 @@ public class ApplicationService {
         return modelMapper.map(saved, ApplicationDTO.class);
     }
 
-    public ApplicationDTO changeStatus(Integer applicationId, String status) {
+    /*
+    public ApplicationViewDTO changeStatus(Integer applicationId, String status) {
         Application application = applicationRepository.findById(applicationId).orElseThrow(() -> new ResourceNotFoundException("Application does not exist."));
         application.setStatus(status);
         Application saved = applicationRepository.save(application);
-        return modelMapper.map(saved, ApplicationDTO.class);
+        return modelMapper.map(saved, ApplicationViewDTO.class);
+    }*/
+
+    public ApplicationViewDTO changeStatus(Integer applicationId, String status) {
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Application does not exist."));
+        application.setStatus(status);
+        Application saved = applicationRepository.save(application);
+        return mapToDTO(saved);
     }
 
     public List<ApplicationDTO> getAllByStudentId(Integer studentId) {
@@ -73,12 +83,45 @@ public class ApplicationService {
         return modelMapper.map(app, ApplicationDTO.class);
     }
 
-    public List<ApplicationDTO> getAllByCompanyId(Integer companyId) {
-        return applicationRepository.findAllByInternshipCompanyId(companyId).stream().map(application -> modelMapper.map(application, ApplicationDTO.class)).collect(Collectors.toList());
+    public List<ApplicationViewDTO> getAllByCompanyId(Integer companyId) {
+        return applicationRepository
+                .findAllByInternshipCompanyId(companyId)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<ApplicationViewDTO> getAllByCompanyIdPending(Integer companyId) {
+        return applicationRepository
+                .findAllByStatusAndInternshipCompanyId("PENDING", companyId)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
     public List<ApplicationDTO> getAllForStudentWithStatus(Integer studentId, String status)
     {
         return applicationRepository.findAllByStudentIdAndStatus(studentId, status).stream().map(application -> modelMapper.map(application, ApplicationDTO.class)).collect(Collectors.toList());
+    }
+
+    private ApplicationViewDTO mapToDTO(Application application) {
+        ApplicationViewDTO dto = new ApplicationViewDTO();
+
+        dto.setId(application.getId());
+        dto.setStatus(application.getStatus());
+        dto.setDate(application.getDate());
+        dto.setInternshipId(application.getInternship().getId());
+        dto.setStudentId(application.getStudent().getId());
+
+        dto.setStudentName(
+                application.getStudent().getFirstName() + " " +
+                        application.getStudent().getLastName()
+        );
+
+        dto.setInternshipName(
+                application.getInternship().getName()
+        );
+
+        return dto;
     }
 }

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.unibl.etf.ip.backendapp.dto.ApplicationDTO;
+import org.unibl.etf.ip.backendapp.dto.ApplicationViewDTO;
 import org.unibl.etf.ip.backendapp.service.ApplicationService;
 
 import java.util.List;
@@ -40,8 +41,14 @@ public class ApplicationController {
     }
 
     @GetMapping("/company/{companyId}")
-    public ResponseEntity<List<ApplicationDTO>> getAllForCompany(@PathVariable Integer companyId) {
-        List<ApplicationDTO> applications = applicationService.getAllByCompanyId(companyId);
+    public ResponseEntity<List<ApplicationViewDTO>> getAllForCompany(@PathVariable Integer companyId) {
+        List<ApplicationViewDTO> applications = applicationService.getAllByCompanyId(companyId);
+        return ResponseEntity.ok(applications);
+    }
+
+    @GetMapping("/company/{companyId}/pending")
+    public ResponseEntity<List<ApplicationViewDTO>> getAllPendingForCompany(@PathVariable Integer companyId) {
+        List<ApplicationViewDTO> applications = applicationService.getAllByCompanyIdPending(companyId);
         return ResponseEntity.ok(applications);
     }
 
@@ -51,9 +58,9 @@ public class ApplicationController {
         return ResponseEntity.ok(created);
     }
 
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<ApplicationDTO> changeStatus(@PathVariable Integer id, @RequestParam String status) {
-        ApplicationDTO updated = applicationService.changeStatus(id, status);
+    @PutMapping("/{id}/status")
+    public ResponseEntity<ApplicationViewDTO> changeStatus(@PathVariable Integer id, @RequestParam String status) {
+        ApplicationViewDTO updated = applicationService.changeStatus(id, status);
         return ResponseEntity.ok(updated);
     }
 }
