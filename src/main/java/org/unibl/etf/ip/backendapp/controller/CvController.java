@@ -1,11 +1,14 @@
 package org.unibl.etf.ip.backendapp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.unibl.etf.ip.backendapp.dto.CvDTO;
+import org.unibl.etf.ip.backendapp.dto.PdfDTO;
+import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
 import org.unibl.etf.ip.backendapp.service.CvService;
 //import tools.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -66,4 +69,12 @@ public class CvController {
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/downloadPdf/{studentId}")
+    public ResponseEntity<byte[]> downloadPdf(@PathVariable Integer studentId) {
+        PdfDTO pdf = cvService.generateCvPdf(studentId);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + pdf.getFileName() + "\"")
+                .body(pdf.getData());
+    }
 }

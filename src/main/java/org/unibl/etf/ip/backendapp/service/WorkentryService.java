@@ -71,6 +71,12 @@ public class WorkentryService {
         return workentryRepository.findByStudentId(studentId).stream().map(workentry -> modelMapper.map(workentry, WorkentryDTO.class)).collect(Collectors.toList());
     }
 
+    public List<WorkentryDTO> getAllForStudentAndInternship(Integer studentId, Integer internhsipId)
+    {
+        return workentryRepository.findByStudentIdAndInternshipId(studentId, internhsipId).stream().map(workentry -> modelMapper.map(workentry, WorkentryDTO.class)).collect(Collectors.toList());
+    }
+
+
     public List<WorkentryDTO> getAllForInternship(Integer internshipId)
     {
         return workentryRepository.findByInternshipId(internshipId).stream().map(workentry -> modelMapper.map(workentry, WorkentryDTO.class)).collect(Collectors.toList());

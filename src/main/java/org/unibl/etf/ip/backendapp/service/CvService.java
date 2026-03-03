@@ -1,19 +1,24 @@
 package org.unibl.etf.ip.backendapp.service;
 
-import jakarta.persistence.EntityNotFoundException;
+import com.lowagie.text.pdf.BaseFont;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.unibl.etf.ip.backendapp.dto.CvDTO;
+import org.unibl.etf.ip.backendapp.dto.PdfDTO;
 import org.unibl.etf.ip.backendapp.entity.Cv;
 import org.unibl.etf.ip.backendapp.entity.Student;
 import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
 import org.unibl.etf.ip.backendapp.repository.CVRepository;
 import org.unibl.etf.ip.backendapp.repository.StudentRepository;
-
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.pdf.draw.LineSeparator;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Transactional
 @Service
@@ -33,6 +38,59 @@ public class CvService {
         this.fileStorageService = fileStorageService;
     }
 
+    public PdfDTO generateCvPdf(Integer studentId) throws DocumentException {
+        CvDTO cv = getByStudent(studentId);
+        String fileName = "CV_" + cv.getFirstName() + "_" + cv.getLastName() + ".pdf";
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Document document = new Document(PageSize.A4);
+        PdfWriter.getInstance(document, out);
+        document.open();
+        Font titleFont, sectionFont, textFont;
+        try {
+            BaseFont base = BaseFont.createFont("src/main/resources/fonts/DejaVuSans.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            BaseFont baseBold = BaseFont.createFont("src/main/resources/fonts/DejaVuSans-Bold.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            titleFont = new Font(baseBold, 20);
+            sectionFont = new Font(baseBold, 14);
+            textFont = new Font(base, 11);
+        } catch (Exception e) {
+            titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20);
+            sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14);
+            textFont = FontFactory.getFont(FontFactory.HELVETICA, 11);
+        }
+
+        Paragraph name = new Paragraph(cv.getFirstName() + " " + cv.getLastName(), titleFont);
+        name.setAlignment(Element.ALIGN_CENTER);
+        name.setSpacingAfter(10);
+        document.add(name);
+
+        Paragraph contact = new Paragraph("Contact: " + cv.getContact(), textFont);
+        contact.setAlignment(Element.ALIGN_CENTER);
+        contact.setSpacingAfter(20);
+        document.add(contact);
+        document.add(new LineSeparator());
+
+        addPdfSection(document, "About", cv.getDescription(), sectionFont, textFont);
+        addPdfSection(document, "Education", cv.getSchool(), sectionFont, textFont);
+        addPdfSection(document, "Skills", cv.getSkills(), sectionFont, textFont);
+        addPdfSection(document, "Experience", cv.getExperience(), sectionFont, textFont);
+        addPdfSection(document, "Internships", cv.getInternships(), sectionFont, textFont);
+        addPdfSection(document, "Training", cv.getTraining(), sectionFont, textFont);
+        addPdfSection(document, "Interests", cv.getInterests(), sectionFont, textFont);
+
+        document.close();
+        return new PdfDTO(fileName, out.toByteArray());
+    }
+
+    private void addPdfSection(Document document, String title, String content, Font sFont, Font tFont) throws DocumentException {
+        if (content != null && !content.trim().isEmpty()) {
+            Paragraph pTitle = new Paragraph("\n" + title, sFont);
+            pTitle.setSpacingBefore(0);
+            document.add(pTitle);
+            Paragraph pContent = new Paragraph(content, tFont);
+            pContent.setSpacingBefore(5);
+            document.add(pContent);
+        }
+    }
 
     public CvDTO getById(Integer cvId) {
         Cv cv = cvRepository.findById(cvId).orElseThrow(() -> new ResourceNotFoundException("CV with id " + cvId + " not found"));
@@ -43,8 +101,7 @@ public class CvService {
         if (!studentRepository.existsById(studentId)) {
             throw new ResourceNotFoundException("Student not found");
         }
-        Cv cv = cvRepository.findByStudentId(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("CV not found"));
+        Cv cv = cvRepository.findByStudentId(studentId).orElseThrow(() -> new ResourceNotFoundException("CV not found"));
         return modelMapper.map(cv, CvDTO.class);
     }
 

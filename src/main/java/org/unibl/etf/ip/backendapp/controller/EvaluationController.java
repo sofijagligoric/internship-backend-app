@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.unibl.etf.ip.backendapp.dto.EvaluationDTO;
 import org.unibl.etf.ip.backendapp.dto.GradeDTO;
+import org.unibl.etf.ip.backendapp.dto.WorkentryDTO;
 import org.unibl.etf.ip.backendapp.service.EvaluationService;
 
 import java.util.List;
@@ -58,5 +59,11 @@ public class EvaluationController {
     public ResponseEntity<EvaluationDTO> update(@PathVariable Integer id, @RequestBody EvaluationDTO evaluationDTO) {
         EvaluationDTO updated = evaluationService.update(id, evaluationDTO);
         return ResponseEntity.ok(updated);
+    }
+
+    @GetMapping("/student/{studentId}/internship/{internshipId}")
+    public ResponseEntity<EvaluationDTO> getByStudentIdAndInternshipId(@PathVariable Integer internshipId, @PathVariable Integer studentId) {
+        EvaluationDTO workentry = evaluationService.getForStudentAndInternship(studentId, internshipId);
+        return ResponseEntity.ok(workentry);
     }
 }

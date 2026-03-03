@@ -80,6 +80,11 @@ public class EvaluationService {
         return modelMapper.map(evaluation, EvaluationDTO.class);
     }
 
+    public EvaluationDTO getForStudentAndInternship(int studentId, int internshipId) {
+        Evaluation evaluation = evaluationRepository.findByStudentIdAndInternshipId(studentId, internshipId).orElseThrow(() -> new ResourceNotFoundException("Evaluation with studentId " + studentId + " and internshipId " + internshipId + "not found"));
+        return modelMapper.map(evaluation, EvaluationDTO.class);
+    }
+
     public List<EvaluationDTO> getAll()
     {
         return evaluationRepository.findAll().stream().map(evaluation -> modelMapper.map(evaluation, EvaluationDTO.class)).collect(Collectors.toList());

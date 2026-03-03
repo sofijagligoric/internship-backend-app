@@ -33,6 +33,12 @@ public class WorkentryController {
         return ResponseEntity.ok(workentry);
     }
 
+    @GetMapping("/student/{studentId}/internship/{internshipId}")
+    public ResponseEntity<List<WorkentryDTO>> getByStudentIdAndInternshipId(@PathVariable Integer internshipId, @PathVariable Integer studentId) {
+        List<WorkentryDTO> workentry = workentryService.getAllForStudentAndInternship(studentId, internshipId);
+        return ResponseEntity.ok(workentry);
+    }
+
     @GetMapping
     public ResponseEntity<List<WorkentryDTO>> getAll() {
         List<WorkentryDTO> workentrys = workentryService.getAll();
