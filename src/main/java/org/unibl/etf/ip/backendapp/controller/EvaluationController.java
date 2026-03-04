@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.unibl.etf.ip.backendapp.dto.EvaluationDTO;
+import org.unibl.etf.ip.backendapp.dto.EvaluationViewDTO;
 import org.unibl.etf.ip.backendapp.dto.GradeDTO;
 import org.unibl.etf.ip.backendapp.dto.WorkentryDTO;
 import org.unibl.etf.ip.backendapp.service.EvaluationService;
@@ -46,6 +47,12 @@ public class EvaluationController {
     @GetMapping("/student/{studentId}")
     public ResponseEntity<List<EvaluationDTO>> getByStudentId(@PathVariable Integer studentId) {
         List<EvaluationDTO> evaluation = evaluationService.getForStudent(studentId);
+        return ResponseEntity.ok(evaluation);
+    }
+
+    @GetMapping("/student/{studentId}/all")
+    public ResponseEntity<List<EvaluationViewDTO>> getByAllStudentId(@PathVariable Integer studentId) {
+        List<EvaluationViewDTO> evaluation = evaluationService.getAllForStudent(studentId);
         return ResponseEntity.ok(evaluation);
     }
 

@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.unibl.etf.ip.backendapp.dto.CreateCompanyDTO;
 import org.unibl.etf.ip.backendapp.dto.CompanyDTO;
+import org.unibl.etf.ip.backendapp.dto.InternshipDTO;
 import org.unibl.etf.ip.backendapp.service.CompanyService;
 
 import java.util.List;
@@ -51,7 +52,7 @@ public class CompanyController {
         return ResponseEntity.ok(updated);
     }
 
-    @PatchMapping("/{id}/status")
+    @PutMapping("/{id}/status")
     public ResponseEntity<Void> changeStatus(@PathVariable Integer id) {
         companyService.changeStatus(id);
         return ResponseEntity.ok().build();

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.unibl.etf.ip.backendapp.dto.WorkentryDTO;
+import org.unibl.etf.ip.backendapp.dto.WorkentryViewDTO;
 import org.unibl.etf.ip.backendapp.service.WorkentryService;
 
 import java.util.List;
@@ -24,6 +25,12 @@ public class WorkentryController {
     @GetMapping("/student/{studentId}")
     public ResponseEntity<List<WorkentryDTO>> getByStudentId(@PathVariable Integer studentId) {
         List<WorkentryDTO> workentry = workentryService.getAllForStudent(studentId);
+        return ResponseEntity.ok(workentry);
+    }
+
+    @GetMapping("/student/{studentId}/all")
+    public ResponseEntity<List<WorkentryViewDTO>> getAllByStudentId(@PathVariable Integer studentId) {
+        List<WorkentryViewDTO> workentry = workentryService.getAllForStudentView(studentId);
         return ResponseEntity.ok(workentry);
     }
 

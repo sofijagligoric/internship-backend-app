@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.unibl.etf.ip.backendapp.dto.ApplicationViewDTO;
+import org.unibl.etf.ip.backendapp.dto.AvailableInternshipDTO;
 import org.unibl.etf.ip.backendapp.dto.InternshipDTO;
 import org.unibl.etf.ip.backendapp.service.InternshipService;
 
@@ -25,8 +26,14 @@ public class InternshipController {
 
     @GetMapping("/available")
     public ResponseEntity<List<InternshipDTO>> getAvailable() {
-        List<InternshipDTO> internship = internshipService.getAllAvailable();
-        return ResponseEntity.ok(internship);
+        List<InternshipDTO> internships = internshipService.getAllAvailable();
+        return ResponseEntity.ok(internships);
+    }
+
+    @GetMapping("/available/all")
+    public ResponseEntity<List<AvailableInternshipDTO>> getAvailableInternships() {
+        List<AvailableInternshipDTO> internships = internshipService.getAllAvailableInternships();
+        return ResponseEntity.ok(internships);
     }
 
     @GetMapping

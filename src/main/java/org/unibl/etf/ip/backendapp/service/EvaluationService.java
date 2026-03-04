@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.unibl.etf.ip.backendapp.dto.EvaluationDTO;
+import org.unibl.etf.ip.backendapp.dto.EvaluationViewDTO;
 import org.unibl.etf.ip.backendapp.entity.*;
 import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
 import org.unibl.etf.ip.backendapp.repository.CompanyRepository;
@@ -63,16 +64,12 @@ public class EvaluationService {
         return evaluationRepository.findByStudentId(studentId).stream().map(evaluation -> modelMapper.map(evaluation, EvaluationDTO.class)).collect(Collectors.toList());
     }
 
+    public List<EvaluationViewDTO> getAllForStudent(Integer studentId) {
+        return evaluationRepository.findByStudentId(studentId).stream().map(evaluation -> modelMapper.map(evaluation, EvaluationViewDTO.class)).collect(Collectors.toList());
+    }
+
     public List<EvaluationDTO> getForCompany(Integer companyId) {
         return evaluationRepository.findByCompanyId(companyId).stream().map(evaluation -> modelMapper.map(evaluation, EvaluationDTO.class)).collect(Collectors.toList());
-    }
-
-    public List<EvaluationDTO> getForInternship(Integer internshipId) {
-        return evaluationRepository.findByInternshipId(internshipId).stream().map(evaluation -> modelMapper.map(evaluation, EvaluationDTO.class)).collect(Collectors.toList());
-    }
-
-    public List<EvaluationDTO> getForStudentAndCompany(Integer studentId, Integer companyId) {
-        return evaluationRepository.findByStudentIdAndCompanyId(studentId, companyId).stream().map(evaluation -> modelMapper.map(evaluation, EvaluationDTO.class)).collect(Collectors.toList());
     }
 
     public EvaluationDTO getById(int evaluationId) {

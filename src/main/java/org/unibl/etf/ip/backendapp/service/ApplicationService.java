@@ -83,6 +83,18 @@ public class ApplicationService {
         return modelMapper.map(app, ApplicationDTO.class);
     }
 
+    public List<ApplicationDTO> getAllForStudentWithStatus(Integer studentId, String status)
+    {
+        return applicationRepository.findAllByStudentIdAndStatus(studentId, status).stream().map(application -> modelMapper.map(application, ApplicationDTO.class)).collect(Collectors.toList());
+    }
+    public List<ApplicationViewDTO> getAllByCompanyId(Integer companyId) {
+        return applicationRepository.findAllForComapny(companyId);
+    }
+
+    public List<ApplicationViewDTO> getAllByCompanyIdPending(Integer companyId) {
+        return applicationRepository.findAllPendingDTO("PENDING", companyId);
+    }
+/*
     public List<ApplicationViewDTO> getAllByCompanyId(Integer companyId) {
         return applicationRepository
                 .findAllByInternshipCompanyId(companyId)
@@ -99,10 +111,7 @@ public class ApplicationService {
                 .collect(Collectors.toList());
     }
 
-    public List<ApplicationDTO> getAllForStudentWithStatus(Integer studentId, String status)
-    {
-        return applicationRepository.findAllByStudentIdAndStatus(studentId, status).stream().map(application -> modelMapper.map(application, ApplicationDTO.class)).collect(Collectors.toList());
-    }
+ */
 
     private ApplicationViewDTO mapToDTO(Application application) {
         ApplicationViewDTO dto = new ApplicationViewDTO();

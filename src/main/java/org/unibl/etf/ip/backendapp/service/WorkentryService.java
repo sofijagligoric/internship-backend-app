@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.unibl.etf.ip.backendapp.dto.WorkentryDTO;
+import org.unibl.etf.ip.backendapp.dto.WorkentryViewDTO;
 import org.unibl.etf.ip.backendapp.entity.Internship;
 import org.unibl.etf.ip.backendapp.entity.Workentry;
 import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
@@ -69,6 +70,11 @@ public class WorkentryService {
     public List<WorkentryDTO> getAllForStudent(Integer studentId)
     {
         return workentryRepository.findByStudentId(studentId).stream().map(workentry -> modelMapper.map(workentry, WorkentryDTO.class)).collect(Collectors.toList());
+    }
+
+    public List<WorkentryViewDTO> getAllForStudentView(Integer studentId)
+    {
+        return workentryRepository.findByStudentId(studentId).stream().map(workentry -> modelMapper.map(workentry, WorkentryViewDTO.class)).collect(Collectors.toList());
     }
 
     public List<WorkentryDTO> getAllForStudentAndInternship(Integer studentId, Integer internhsipId)
