@@ -3,14 +3,10 @@ package org.unibl.etf.ip.backendapp.service;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.unibl.etf.ip.backendapp.dto.ApplicationViewDTO;
-import org.unibl.etf.ip.backendapp.dto.AvailableInternshipDTO;
+import org.unibl.etf.ip.backendapp.dto.InternshipViewDTO;
 import org.unibl.etf.ip.backendapp.dto.InternshipDTO;
-import org.unibl.etf.ip.backendapp.dto.WorkentryDTO;
-import org.unibl.etf.ip.backendapp.entity.Application;
 import org.unibl.etf.ip.backendapp.entity.Company;
 import org.unibl.etf.ip.backendapp.entity.Internship;
-import org.unibl.etf.ip.backendapp.entity.Workentry;
 import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
 import org.unibl.etf.ip.backendapp.repository.CompanyRepository;
 import org.unibl.etf.ip.backendapp.repository.InternshipRepository;
@@ -35,6 +31,9 @@ public class InternshipService {
     public List<InternshipDTO> getAll() {
         return internshipRepository.findAll().stream().map(internship -> modelMapper.map(internship, InternshipDTO.class)).collect(Collectors.toList());
     }
+    public List<InternshipViewDTO> getAllView() {
+        return internshipRepository.findAll().stream().map(internship -> modelMapper.map(internship, InternshipViewDTO.class)).collect(Collectors.toList());
+    }
 
     public List<InternshipDTO> getAllByCompanyId(int companyId) {
         return internshipRepository.findByCompanyId(companyId).stream().map(internship -> modelMapper.map(internship, InternshipDTO.class)).collect(Collectors.toList());
@@ -44,10 +43,17 @@ public class InternshipService {
         return internshipRepository.findByAvailable(true).stream().map(internship -> modelMapper.map(internship, InternshipDTO.class)).collect(Collectors.toList());
    }
 
-    public List<AvailableInternshipDTO> getAllAvailableInternships() {
-        return internshipRepository.findByAvailable(true).stream().map(internship -> modelMapper.map(internship, AvailableInternshipDTO.class)).collect(Collectors.toList());
+    public List<InternshipViewDTO> getAllAvailableInternships() {
+        return internshipRepository.findByAvailable(true).stream().map(internship -> modelMapper.map(internship, InternshipViewDTO.class)).collect(Collectors.toList());
     }
 
+    public InternshipViewDTO getViewById(int internshipId) {
+        Internship internship = internshipRepository.findById(internshipId).orElseThrow(() -> new ResourceNotFoundException("Internship with id " + internshipId + " not found"));
+        if(!internship.getAvailable()) {
+            throw new ResourceNotFoundException("This internship is not available.");
+        }
+        return modelMapper.map(internship, InternshipViewDTO.class);
+    }
 
    public InternshipDTO getById(int internshipId) {
        Internship internship = internshipRepository.findById(internshipId).orElseThrow(() -> new ResourceNotFoundException("Internship with id " + internshipId + " not found"));

@@ -28,6 +28,13 @@ public class ApplicationController {
         return ResponseEntity.ok(applications);
     }
 
+    @GetMapping("/student/all/{studentId}")
+    public ResponseEntity<List<ApplicationViewDTO>> getAllForStudentView(@PathVariable Integer studentId) {
+        List<ApplicationViewDTO> applications = applicationService.getAllByStudentIdView(studentId);
+        return ResponseEntity.ok(applications);
+    }
+
+
     @GetMapping("/student/status")
     public ResponseEntity<List<ApplicationDTO>> getAllForStudentWithStatus(@RequestParam Integer studentId, @RequestParam String status) {
         List<ApplicationDTO> applications = applicationService.getAllForStudentWithStatus(studentId, status);

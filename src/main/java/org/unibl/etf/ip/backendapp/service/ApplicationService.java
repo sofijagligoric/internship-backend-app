@@ -74,6 +74,10 @@ public class ApplicationService {
         return applicationRepository.findByStudentId(studentId).stream().map(application -> modelMapper.map(application, ApplicationDTO.class)).collect(Collectors.toList());
     }
 
+    public List<ApplicationViewDTO> getAllByStudentIdView(Integer studentId) {
+        return applicationRepository.findAllForStudent(studentId);
+    }
+
     public List<ApplicationDTO> getAllByInternshipId(Integer internshipId) {
         return applicationRepository.findByInternshipId(internshipId).stream().map(application -> modelMapper.map(application, ApplicationDTO.class)).collect(Collectors.toList());
     }

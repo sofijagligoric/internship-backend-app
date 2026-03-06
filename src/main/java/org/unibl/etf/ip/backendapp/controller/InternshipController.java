@@ -4,8 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.unibl.etf.ip.backendapp.dto.ApplicationViewDTO;
-import org.unibl.etf.ip.backendapp.dto.AvailableInternshipDTO;
+import org.unibl.etf.ip.backendapp.dto.InternshipViewDTO;
 import org.unibl.etf.ip.backendapp.dto.InternshipDTO;
 import org.unibl.etf.ip.backendapp.service.InternshipService;
 
@@ -24,6 +23,12 @@ public class InternshipController {
         return ResponseEntity.ok(internship);
     }
 
+    @GetMapping("/view/{id}")
+    public ResponseEntity<InternshipViewDTO> getViewById(@PathVariable Integer id) {
+        InternshipViewDTO internship = internshipService.getViewById(id);
+        return ResponseEntity.ok(internship);
+    }
+
     @GetMapping("/{companyId}/{id}")
     public ResponseEntity<InternshipDTO> getByIdForCompany(@PathVariable Integer companyId, @PathVariable Integer id) {
         InternshipDTO internship = internshipService.getByIdForCompany(companyId, id);
@@ -37,8 +42,14 @@ public class InternshipController {
     }
 
     @GetMapping("/available/all")
-    public ResponseEntity<List<AvailableInternshipDTO>> getAvailableInternships() {
-        List<AvailableInternshipDTO> internships = internshipService.getAllAvailableInternships();
+    public ResponseEntity<List<InternshipViewDTO>> getAvailableInternships() {
+        List<InternshipViewDTO> internships = internshipService.getAllAvailableInternships();
+        return ResponseEntity.ok(internships);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<InternshipViewDTO>> getAllView() {
+        List<InternshipViewDTO> internships = internshipService.getAllView();
         return ResponseEntity.ok(internships);
     }
 

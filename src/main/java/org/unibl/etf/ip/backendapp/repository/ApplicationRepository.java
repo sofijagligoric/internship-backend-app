@@ -22,6 +22,14 @@ public interface ApplicationRepository extends JpaRepository<Application, Intege
             "FROM Application a " +
             "JOIN a.student s " +
             "JOIN a.internship i " +
+            "WHERE s.id = :studentId")
+    List<ApplicationViewDTO> findAllForStudent(@Param("studentId") Integer studentId);
+    @Query("SELECT new org.unibl.etf.ip.backendapp.dto.ApplicationViewDTO(" +
+            "a.id, a.status, a.date, i.id, s.id, " +
+            "concat(s.firstName, ' ', s.lastName), i.name) " +
+            "FROM Application a " +
+            "JOIN a.student s " +
+            "JOIN a.internship i " +
             "WHERE a.status = :status AND s.id = :studentId")
     List<ApplicationViewDTO> findAllForStudentWithStatus(@Param("status") String status, @Param("studentId") Integer studentId);
     @Query("SELECT new org.unibl.etf.ip.backendapp.dto.ApplicationViewDTO(" +
