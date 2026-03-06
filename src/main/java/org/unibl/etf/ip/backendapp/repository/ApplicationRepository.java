@@ -12,11 +12,18 @@ import java.util.List;
 public interface ApplicationRepository extends JpaRepository<Application, Integer> {
     List<Application> findByStudentId(int id);
     List<Application> findByInternshipId(int id);
-    List<Application> findByStudentIdAndInternshipId(int studentId, int internshipId);
     boolean existsByStudentIdAndInternshipId(int studentId, int internshipId);
     List<Application> findAllByInternshipCompanyId(int companyId);
     List<Application> findAllByStatusAndInternshipCompanyId( String status, int companyId);
     List<Application> findAllByStudentIdAndStatus(int studentId, String status);
+    @Query("SELECT new org.unibl.etf.ip.backendapp.dto.ApplicationViewDTO(" +
+            "a.id, a.status, a.date, i.id, s.id, " +
+            "concat(s.firstName, ' ', s.lastName), i.name) " +
+            "FROM Application a " +
+            "JOIN a.student s " +
+            "JOIN a.internship i " +
+            "WHERE a.status = :status AND s.id = :studentId")
+    List<ApplicationViewDTO> findAllForStudentWithStatus(@Param("status") String status, @Param("studentId") Integer studentId);
     @Query("SELECT new org.unibl.etf.ip.backendapp.dto.ApplicationViewDTO(" +
             "a.id, a.status, a.date, i.id, s.id, " +
             "concat(s.firstName, ' ', s.lastName), i.name) " +

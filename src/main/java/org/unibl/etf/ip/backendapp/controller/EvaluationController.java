@@ -68,9 +68,12 @@ public class EvaluationController {
         return ResponseEntity.ok(updated);
     }
 
-    @GetMapping("/student/{studentId}/internship/{internshipId}")
-    public ResponseEntity<EvaluationDTO> getByStudentIdAndInternshipId(@PathVariable Integer internshipId, @PathVariable Integer studentId) {
-        EvaluationDTO workentry = evaluationService.getForStudentAndInternship(studentId, internshipId);
+    @GetMapping("/company/{companyId}/internship/{internshipId}/student/{studentId}")
+    public ResponseEntity<EvaluationDTO> getByStudentIdAndInternshipId(@PathVariable Integer companyId, @PathVariable Integer internshipId, @PathVariable Integer studentId) {
+        EvaluationDTO workentry = evaluationService.getForStudentAndInternship(companyId, studentId, internshipId);
+        if (workentry == null) {
+            return ResponseEntity.noContent().build();
+        }
         return ResponseEntity.ok(workentry);
     }
 }

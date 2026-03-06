@@ -34,6 +34,14 @@ public class ApplicationController {
         return ResponseEntity.ok(applications);
     }
 
+    @GetMapping("/view/s/status")
+    public ResponseEntity<List<ApplicationViewDTO>> getAllForStudentWithStatusView(
+            @RequestParam Integer studentId,
+            @RequestParam String status) {
+        List<ApplicationViewDTO> applications = applicationService.getAllForStudentWithStatusView(studentId, status);
+        return ResponseEntity.ok(applications);
+    }
+
     @GetMapping("/internship/{internshipId}")
     public ResponseEntity<List<ApplicationDTO>> getAllForInternship(@PathVariable Integer internshipId) {
         List<ApplicationDTO> applications = applicationService.getAllByInternshipId(internshipId);

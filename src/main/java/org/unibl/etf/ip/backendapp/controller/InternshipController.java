@@ -24,6 +24,12 @@ public class InternshipController {
         return ResponseEntity.ok(internship);
     }
 
+    @GetMapping("/{companyId}/{id}")
+    public ResponseEntity<InternshipDTO> getByIdForCompany(@PathVariable Integer companyId, @PathVariable Integer id) {
+        InternshipDTO internship = internshipService.getByIdForCompany(companyId, id);
+        return ResponseEntity.ok(internship);
+    }
+
     @GetMapping("/available")
     public ResponseEntity<List<InternshipDTO>> getAvailable() {
         List<InternshipDTO> internships = internshipService.getAllAvailable();
@@ -42,16 +48,6 @@ public class InternshipController {
         return ResponseEntity.ok(internships);
     }
 
-    /*
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        if (internshipService.delete(id)) {
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
-    }
-
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         try {

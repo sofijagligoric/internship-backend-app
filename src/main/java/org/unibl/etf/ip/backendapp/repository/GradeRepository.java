@@ -10,5 +10,5 @@ public interface GradeRepository extends JpaRepository<Grade, Integer> {
     List<Grade> findByStudentIdAndFacultyId(int studentId, int facultyId);
     List<Grade> findByFacultyId(int facultyId);
     List<Grade> findByInternshipId(int internshipId);
-    boolean existsByStudentAndInternshipId(int studentId, int internshipId);
+    boolean existsByStudentIdAndInternshipId(int studentId, int internshipId);
 }

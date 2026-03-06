@@ -46,11 +46,6 @@ public class WorkentryService {
 
         Internship internship = internshipRepository.findById(workentryDTO.getInternshipId())
                 .orElseThrow(() -> new ResourceNotFoundException("Internship not found"));
-//
-//        if(weekStart.isBefore(internship.getStartDate()) ||
-//                weekStart.isAfter(internship.getEndDate())) {
-//            throw new RuntimeException("Week is outside internship duration");
-//        }
 
         Workentry workentry = modelMapper.map(workentryDTO, Workentry.class);
         workentry = workentryRepository.save(workentry);
@@ -77,8 +72,13 @@ public class WorkentryService {
         return workentryRepository.findByStudentId(studentId).stream().map(workentry -> modelMapper.map(workentry, WorkentryViewDTO.class)).collect(Collectors.toList());
     }
 
-    public List<WorkentryDTO> getAllForStudentAndInternship(Integer studentId, Integer internhsipId)
+    public List<WorkentryDTO> getAllForStudentAndInternship(Integer companyId, Integer studentId, Integer internhsipId)
     {
+        Internship internship = internshipRepository.findById(internhsipId)
+                .orElseThrow(() -> new ResourceNotFoundException("Internship not found"));
+        if (!internship.getCompany().getId().equals(companyId)) {
+            throw new ResourceNotFoundException("This internship does not belong to the specified company.");
+        }
         return workentryRepository.findByStudentIdAndInternshipId(studentId, internhsipId).stream().map(workentry -> modelMapper.map(workentry, WorkentryDTO.class)).collect(Collectors.toList());
     }
 

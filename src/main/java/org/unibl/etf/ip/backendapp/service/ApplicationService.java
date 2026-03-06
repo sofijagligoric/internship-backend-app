@@ -87,6 +87,11 @@ public class ApplicationService {
     {
         return applicationRepository.findAllByStudentIdAndStatus(studentId, status).stream().map(application -> modelMapper.map(application, ApplicationDTO.class)).collect(Collectors.toList());
     }
+
+    public List<ApplicationViewDTO> getAllForStudentWithStatusView(Integer studentId, String status)
+    {
+        return applicationRepository.findAllForStudentWithStatus(status, studentId);
+    }
     public List<ApplicationViewDTO> getAllByCompanyId(Integer companyId) {
         return applicationRepository.findAllForComapny(companyId);
     }

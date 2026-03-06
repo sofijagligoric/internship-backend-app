@@ -13,6 +13,7 @@ import org.unibl.etf.ip.backendapp.repository.InternshipRepository;
 import org.unibl.etf.ip.backendapp.repository.StudentRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,9 +78,18 @@ public class EvaluationService {
         return modelMapper.map(evaluation, EvaluationDTO.class);
     }
 
-    public EvaluationDTO getForStudentAndInternship(int studentId, int internshipId) {
-        Evaluation evaluation = evaluationRepository.findByStudentIdAndInternshipId(studentId, internshipId).orElseThrow(() -> new ResourceNotFoundException("Evaluation with studentId " + studentId + " and internshipId " + internshipId + "not found"));
-        return modelMapper.map(evaluation, EvaluationDTO.class);
+    public EvaluationDTO getForStudentAndInternship(int companyId, int studentId, int internshipId) {
+        Internship internship = internshipRepository.findById(internshipId)
+                .orElseThrow(() -> new ResourceNotFoundException("Internship not found"));
+        if (!internship.getCompany().getId().equals(companyId)) {
+            throw new ResourceNotFoundException("This internship does not belong to the specified company.");
+        }
+        Optional<Evaluation> evaluationOpt = evaluationRepository.findByStudentIdAndInternshipId(studentId, internshipId);
+        if (evaluationOpt.isPresent()) {
+            return modelMapper.map(evaluationOpt.get(), EvaluationDTO.class);
+        } else {
+            return null;
+        }
     }
 
     public List<EvaluationDTO> getAll()

@@ -33,7 +33,7 @@ public class GradeService {
     }
 
     public GradeDTO create(GradeDTO gradeDTO) {
-        if(gradeRepository.existsByStudentAndInternshipId(gradeDTO.getStudentId(), gradeDTO.getInternshipId())) {
+        if(gradeRepository.existsByStudentIdAndInternshipId(gradeDTO.getStudentId(), gradeDTO.getInternshipId())) {
             throw new RuntimeException("Grade for this student and this internship already exists.");
         }
         Faculty faculty = facultyRepository.findById(gradeDTO.getFacultyId()).orElseThrow(() -> new ResourceNotFoundException("Faculty does not exist."));

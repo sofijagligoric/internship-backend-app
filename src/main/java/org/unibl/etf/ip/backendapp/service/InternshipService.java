@@ -54,6 +54,14 @@ public class InternshipService {
        return modelMapper.map(internship, InternshipDTO.class);
    }
 
+    public InternshipDTO getByIdForCompany(int companyId, int internshipId) {
+        Internship internship = internshipRepository.findById(internshipId).orElseThrow(() -> new ResourceNotFoundException("Internship with id " + internshipId + " not found"));
+        if(internship.getCompany().getId() != companyId) {
+            throw new ResourceNotFoundException("This internship does not belong to the specified company.");
+        }
+        return modelMapper.map(internship, InternshipDTO.class);
+    }
+
    public InternshipDTO create(InternshipDTO internshipDTO) {
        Company company = companyRepository.findById(internshipDTO.getCompanyId())
                .orElseThrow(() -> new ResourceNotFoundException("Company does not exist."));
