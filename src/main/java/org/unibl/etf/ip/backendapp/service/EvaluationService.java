@@ -7,10 +7,7 @@ import org.unibl.etf.ip.backendapp.dto.EvaluationDTO;
 import org.unibl.etf.ip.backendapp.dto.EvaluationViewDTO;
 import org.unibl.etf.ip.backendapp.entity.*;
 import org.unibl.etf.ip.backendapp.exceptions.ResourceNotFoundException;
-import org.unibl.etf.ip.backendapp.repository.CompanyRepository;
-import org.unibl.etf.ip.backendapp.repository.EvaluationRepository;
-import org.unibl.etf.ip.backendapp.repository.InternshipRepository;
-import org.unibl.etf.ip.backendapp.repository.StudentRepository;
+import org.unibl.etf.ip.backendapp.repository.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,9 +21,11 @@ public class EvaluationService {
     private ModelMapper modelMapper;
     private CompanyRepository companyRepository;
     private InternshipRepository internshipRepository;
+    private ApplicationRepository applicationRepository;
 
-    public EvaluationService(EvaluationRepository evaluationRepository, InternshipRepository internshipRepository, StudentRepository studentRepository, ModelMapper modelMapper, CompanyRepository facadeRepository) {
+    public EvaluationService(EvaluationRepository evaluationRepository, ApplicationRepository applicationRepository, InternshipRepository internshipRepository, StudentRepository studentRepository, ModelMapper modelMapper, CompanyRepository facadeRepository) {
         this.evaluationRepository = evaluationRepository;
+        this.applicationRepository = applicationRepository;
         this.studentRepository = studentRepository;
         this.modelMapper = modelMapper;
         this.internshipRepository = internshipRepository;
@@ -79,6 +78,8 @@ public class EvaluationService {
     }
 
     public EvaluationDTO getForStudentAndInternship(int companyId, int studentId, int internshipId) {
+        if(!applicationRepository.existsByStudentIdAndInternshipIdAndStatus(studentId, internshipId, "ACCEPTED"))
+            throw new ResourceNotFoundException("Student is not accepted to this internship.");
         Internship internship = internshipRepository.findById(internshipId)
                 .orElseThrow(() -> new ResourceNotFoundException("Internship not found"));
         if (!internship.getCompany().getId().equals(companyId)) {

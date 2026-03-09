@@ -14,6 +14,7 @@ public class InternshipViewDTO {
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;
+    private Boolean available;
     private String about;
     private String technologies;
     private String skills;
