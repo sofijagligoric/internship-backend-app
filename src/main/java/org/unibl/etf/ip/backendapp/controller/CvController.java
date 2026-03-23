@@ -1,6 +1,7 @@
 package org.unibl.etf.ip.backendapp.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.unibl.etf.ip.backendapp.service.CvService;
 //import tools.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -72,9 +74,12 @@ public class CvController {
     @GetMapping("/downloadPdf/{studentId}")
     public ResponseEntity<byte[]> downloadPdf(@PathVariable Integer studentId) {
         PdfDTO pdf = cvService.generateCvPdf(studentId);
+        ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
+                .filename(pdf.getFileName(), StandardCharsets.UTF_8)
+                .build();
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + pdf.getFileName() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
                 .body(pdf.getData());
     }
 }

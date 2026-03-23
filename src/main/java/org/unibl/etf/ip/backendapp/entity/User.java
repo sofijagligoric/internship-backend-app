@@ -21,25 +21,8 @@ public class User {
     @Column(name = "password", nullable = false, length = 500)
     private String password;
 
-    /*
-    @Lob
-    @Column(name = "role", nullable = false)
-    private String role;
-
-     */
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
-    /*
-    @OneToOne
-    private Company company;
-
-    @OneToOne
-    private Faculty faculty;
-
-    @OneToOne
-    private Student student;
-     */
 }

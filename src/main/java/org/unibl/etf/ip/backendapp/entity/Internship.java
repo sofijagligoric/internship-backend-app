@@ -49,20 +49,4 @@ public class Internship {
     @Lob
     @Column(name = "requirements", nullable = false)
     private String requirements;
-
-    /*
-    @OneToMany(mappedBy = "idInternship")
-    private Set<Application> applications = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "idInternship")
-    private Set<Evaluation> evaluations = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "idInternship")
-    private Set<Grade> grades = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "idInternship")
-    private Set<Workentry> workentries = new LinkedHashSet<>();
-
-     */
-
 }

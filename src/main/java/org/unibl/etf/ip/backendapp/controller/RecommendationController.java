@@ -16,11 +16,6 @@ public class RecommendationController {
 
     @Autowired
     private RecommendationService recommendationService;
-   /*
-    @Autowired
-    private GeminiService geminiService;
-
-    */
 
     @GetMapping("/{studentId}")
     public ResponseEntity<List<RecommendationViewDTO>> getRecommendation(@PathVariable("studentId") Integer studentId) {
@@ -28,9 +23,4 @@ public class RecommendationController {
         return ResponseEntity.ok(recommendations);
     }
 
-    /*
-    @GetMapping("/pitaj")
-    public String ask(@RequestParam String pitanje) {
-        return geminiService.generateAnswer(pitanje);
-    }*/
 }

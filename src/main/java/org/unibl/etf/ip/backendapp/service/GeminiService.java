@@ -27,15 +27,15 @@ public class GeminiService {
             return response.text();
         } catch (Exception e) {
             e.printStackTrace();
-            return "Greška prilikom generisanja odgovora: " + e.getMessage();
+            return "Error while generating response: " + e.getMessage();
         }
     }
 
     public void provjeriModele() {
         try {
-            client.models.list(null).forEach(m -> System.out.println("Dostupan model: " + m.name()));
+            client.models.list(null).forEach(m -> System.out.println("Available model: " + m.name()));
         } catch (Exception e) {
-            System.out.println("Ne mogu izlistati modele: " + e.getMessage());
+            System.out.println("Unable to show models: " + e.getMessage());
         }
     }
 }

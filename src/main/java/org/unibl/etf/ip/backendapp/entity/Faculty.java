@@ -23,11 +23,4 @@ public class Faculty {
 
     @Column(name = "name", nullable = false, length = 500)
     private String name;
-
-    /*
-    @OneToMany(mappedBy = "idFaculty")
-    private Set<Grade> grades = new LinkedHashSet<>();
-
-     */
-
 }

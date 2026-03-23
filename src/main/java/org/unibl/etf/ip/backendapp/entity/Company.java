@@ -32,14 +32,4 @@ public class Company {
 
     @Column(name = "address", nullable = false, length = 500)
     private String address;
-
-    /*
-    @OneToMany(mappedBy = "idCompany")
-    private Set<Evaluation> evaluations = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "idCompany")
-    private Set<Internship> internships = new LinkedHashSet<>();
-
-     */
-
 }

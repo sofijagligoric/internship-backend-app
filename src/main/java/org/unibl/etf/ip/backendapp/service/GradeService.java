@@ -65,14 +65,6 @@ public class GradeService {
         return gradeRepository.findByFacultyId(facultyId).stream().map(grade -> modelMapper.map(grade, GradeDTO.class)).collect(Collectors.toList());
     }
 
-    public List<GradeDTO> getForInternship(Integer internshipId) {
-        return gradeRepository.findByInternshipId(internshipId).stream().map(grade -> modelMapper.map(grade, GradeDTO.class)).collect(Collectors.toList());
-    }
-
-    public List<GradeDTO> getForStudentAndFaculty(Integer studentId, Integer facultyId) {
-        return gradeRepository.findByStudentIdAndFacultyId(studentId, facultyId).stream().map(grade -> modelMapper.map(grade, GradeDTO.class)).collect(Collectors.toList());
-    }
-
     public GradeDTO getById(int gradeId) {
         Grade grade = gradeRepository.findById(gradeId).orElseThrow(() -> new ResourceNotFoundException("Grade with id " + gradeId + " not found"));
         return modelMapper.map(grade, GradeDTO.class);
